@@ -21,6 +21,16 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Root endpoint for health check
+app.get('/', (req, res) => {
+  res.json({
+    ok: true,
+    service: 'Portfolio Backend API',
+    version: '1.0.0',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ ok: true, timestamp: new Date().toISOString() });
@@ -29,8 +39,11 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api', routes);
 
-// 404 handler
+// 404 handler (only for non-root paths)
 app.use((req, res) => {
+  if (req.path === '/' && req.method === 'HEAD') {
+    return res.status(200).end();
+  }
   res.status(404).json({
     ok: false,
     code: 'NOT_FOUND',
