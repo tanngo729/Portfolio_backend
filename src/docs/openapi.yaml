@@ -1,0 +1,227 @@
+openapi: 3.0.3
+info:
+  title: Portfolio API
+  version: 1.0.0
+  description: REST API for portfolio website
+
+servers:
+  - url: http://localhost:4000/api
+    description: Development server
+
+paths:
+  /projects:
+    get:
+      summary: Get all projects
+      parameters:
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+            default: -createdAt
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+
+  /projects/{slug}:
+    get:
+      summary: Get project by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+        404:
+          description: Not found
+
+  /skills:
+    get:
+      summary: Get all skills
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [frontend, backend, design, other]
+      responses:
+        200:
+          description: Success
+
+  /contact:
+    post:
+      summary: Submit contact message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                message:
+                  type: string
+                  minLength: 10
+      responses:
+        201:
+          description: Message sent
+        429:
+          description: Rate limit exceeded
+
+  /admin/projects:
+    post:
+      summary: Create project (admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectInput'
+      responses:
+        201:
+          description: Created
+        401:
+          description: Unauthorized
+
+  /admin/projects/{id}:
+    put:
+      summary: Update project (admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Updated
+    delete:
+      summary: Delete project (admin)
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Deleted
+
+components:
+  schemas:
+    Project:
+      type: object
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        thumbnail:
+          type: object
+        description_short:
+          type: string
+        content:
+          type: string
+        live_url:
+          type: string
+        github_url:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ProjectInput:
+      type: object
+      required:
+        - title
+        - slug
+        - thumbnail
+        - content
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+          pattern: ^[a-z0-9-]+$
+        tags:
+          type: array
+          items:
+            type: string
+        thumbnail:
+          type: object
+          required:
+            - url
+          properties:
+            url:
+              type: string
+              format: uri
+            alt:
+              type: string
+        description_short:
+          type: string
+          maxLength: 150
+        content:
+          type: string
+        live_url:
+          type: string
+          format: uri
+        github_url:
+          type: string
+          format: uri
+
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        hasNext:
+          type: boolean
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

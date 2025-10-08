@@ -1,0 +1,40 @@
+{
+  "name": "portfolio-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "seed": "node src/modules/seed-all.js",
+    "seed:admin": "node src/modules/admin/seed.js",
+    "seed:settings": "node src/scripts/seed-settings.js",
+    "seed:all": "npm run seed && npm run seed:admin && npm run seed:settings",
+    "seed:projects": "node src/modules/project/seed.js",
+    "seed:skills": "node src/modules/skill/seed.js",
+    "seed:contacts": "node src/modules/contact/seed.js",
+    "lint": "eslint src --ext .js",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "zod": "^3.22.4",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0",
+    "express-rate-limit": "^7.1.5",
+    "express-async-errors": "^3.1.1",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "vitest": "^1.1.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1"
+  }
+}
